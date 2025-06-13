@@ -1,5 +1,5 @@
 # digitales-KVP-Tool
-1. Klare Struktur entlang des PDCA-Zyklus
+✅ 1. Klare Struktur entlang des PDCA-Zyklus
 Baue die Anwendung entlang der vier Phasen:
 
 Plan: Problemdefinition, Zielsetzung, Ursachenanalyse, Maßnahmenplanung
