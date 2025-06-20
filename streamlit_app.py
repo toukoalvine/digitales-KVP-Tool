@@ -948,4 +948,4 @@ def main():
             st.sidebar.error("Das letzte Projekt kann nicht gelöscht werden.")
 
 if __name__ == "__main__":
-main()
+    main()
