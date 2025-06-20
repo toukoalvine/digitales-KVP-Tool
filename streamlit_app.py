@@ -717,7 +717,7 @@ def main():
     
     with tab2:  # DO
         st.markdown('<div class="phase-card do-card"><h3>🔨 Do - Umsetzen</h3></div>', unsafe_allow_html=True)
-        show_pdca_progress('do')
+        show_modern_pdca_progress('do')
         
         # Aufgaben-Management
         st.subheader("📋 Aufgaben-Tracking")
@@ -948,4 +948,4 @@ def main():
             st.sidebar.error("Das letzte Projekt kann nicht gelöscht werden.")
 
 if __name__ == "__main__":
-    main()
+main()
