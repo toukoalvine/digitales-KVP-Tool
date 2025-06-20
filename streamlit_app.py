@@ -18,184 +18,40 @@ st.set_page_config(
 # CSS für modernes Design
 st.markdown("""
 <style>
-    /* Main container styling */
-    .main-container {
-        background-color: #f8f9fa;
+    .pdca-header {
+        background: linear-gradient(90deg, #FF6B6B, #4ECDC4, #45B7D1, #96CEB4);
         padding: 20px;
-    }
-    
-    /* Header styling */
-    .header {
-        font-size: 28px;
-        font-weight: 600;
-        color: #2c3e50;
-        margin-bottom: 20px;
-    }
-    
-    /* Card styling */
-    .card {
-        background-color: white;
         border-radius: 10px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        padding: 20px;
+        text-align: center;
+        color: white;
+        font-size: 24px;
+        font-weight: bold;
         margin-bottom: 20px;
     }
     
-    .card-title {
-        font-size: 18px;
-        font-weight: 600;
-        color: #2c3e50;
-        margin-bottom: 15px;
+    .phase-card {
+        padding: 15px;
+        border-radius: 10px;
+        margin: 10px 0;
+        border-left: 5px solid;
     }
     
-    /* Colored tabs styling */
-    div[data-testid="stTabs"] > div > div {
-        gap: 10px;
-    }
+    .plan-card { border-left-color: #FF6B6B; background-color: #FFE5E5; }
+    .do-card { border-left-color: #4ECDC4; background-color: #E5F9F6; }
+    .check-card { border-left-color: #45B7D1; background-color: #E5F3FF; }
+    .act-card { border-left-color: #96CEB4; background-color: #E5F5E5; }
     
-    div[data-testid="stTabs"] > div > div > button[data-baseweb="tab"] {
-        background-color: #f0f2f6;
-        border-radius: 8px 8px 0 0 !important;
-        padding: 8px 16px;
-        margin-right: 0 !important;
-        border: none !important;
-        transition: all 0.2s;
-    }
+    .task-completed { text-decoration: line-through; opacity: 0.6; }
+    .priority-high { border-left: 3px solid #FF4444; }
+    .priority-medium { border-left: 3px solid #FFA500; }
+    .priority-low { border-left: 3px solid #4CAF50; }
     
-    div[data-testid="stTabs"] > div > div > button[data-baseweb="tab"]:hover {
-        background-color: #e0e3e9;
-    }
-    
-    /* Plan tab color */
-    div[data-testid="stTabs"] > div > div > button[data-baseweb="tab"]:nth-child(1) {
-        background-color: #FF6B6B !important;
-        color: white !important;
-    }
-    
-    /* Do tab color */
-    div[data-testid="stTabs"] > div > div > button[data-baseweb="tab"]:nth-child(2) {
-        background-color: #4ECDC4 !important;
-        color: white !important;
-    }
-    
-    /* Check tab color */
-    div[data-testid="stTabs"] > div > div > button[data-baseweb="tab"]:nth-child(3) {
-        background-color: #45B7D1 !important;
-        color: white !important;
-    }
-    
-    /* Act tab color */
-    div[data-testid="stTabs"] > div > div > button[data-baseweb="tab"]:nth-child(4) {
-        background-color: #96CEB4 !important;
-        color: white !important;
-    }
-    
-    /* Dashboard tab color */
-    div[data-testid="stTabs"] > div > div > button[data-baseweb="tab"]:nth-child(5) {
-        background-color: #2c3e50 !important;
-        color: white !important;
-    }
-    
-    /* Active tab indicator removal */
-    div[data-testid="stTabs"] > div > div > button[aria-selected="true"]::before {
-        display: none !important;
-    }
-    
-    /* File browser inspired elements */
-    .file-browser-item {
-        display: flex;
-        align-items: center;
-        padding: 10px 15px;
-        border-radius: 8px;
-        margin-bottom: 5px;
-        cursor: pointer;
-        transition: background-color 0.2s;
-    }
-    
-    .file-browser-item:hover {
-        background-color: #f0f2f6;
-    }
-    
-    .file-browser-item-icon {
-        margin-right: 10px;
-        font-size: 20px;
-    }
-    
-    .file-browser-item-text {
-        flex-grow: 1;
-    }
-    
-    .file-browser-item-count {
-        color: #7f8c8d;
-        font-size: 14px;
-    }
-    
-    /* Metric cards */
     .metric-card {
         background: white;
         padding: 20px;
         border-radius: 10px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         text-align: center;
-        margin-bottom: 15px;
-    }
-    
-    .metric-value {
-        font-size: 24px;
-        font-weight: 600;
-        color: #2c3e50;
-    }
-    
-    .metric-label {
-        font-size: 14px;
-        color: #7f8c8d;
-    }
-    
-    /* Task styling */
-    .task-item {
-        display: flex;
-        align-items: center;
-        padding: 12px 15px;
-        background-color: white;
-        border-radius: 8px;
-        margin-bottom: 8px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    }
-    
-    .task-completed {
-        opacity: 0.6;
-        text-decoration: line-through;
-    }
-    
-    /* Status indicators */
-    .status-indicator {
-        display: inline-block;
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        margin-right: 8px;
-    }
-    
-    .status-open { background-color: #e74c3c; }
-    .status-in_progress { background-color: #f39c12; }
-    .status-completed { background-color: #2ecc71; }
-    
-    /* Custom scrollbar */
-    ::-webkit-scrollbar {
-        width: 8px;
-    }
-    
-    ::-webkit-scrollbar-track {
-        background: #f1f1f1;
-    }
-    
-    ::-webkit-scrollbar-thumb {
-        background: #c1c1c1;
-        border-radius: 4px;
-    }
-    
-    ::-webkit-scrollbar-thumb:hover {
-        background: #a8a8a8;
     }
 </style>
 """, unsafe_allow_html=True)
