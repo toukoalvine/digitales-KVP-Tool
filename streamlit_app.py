@@ -48,25 +48,57 @@ st.markdown("""
         margin-bottom: 15px;
     }
     
-    /* Sidebar styling */
-    .sidebar .sidebar-content {
-        background-color: #f8f9fa;
+    /* Colored tabs styling */
+    div[data-testid="stTabs"] > div > div {
+        gap: 10px;
     }
     
-    /* Button styling */
-    .stButton>button {
-        border-radius: 8px;
+    div[data-testid="stTabs"] > div > div > button[data-baseweb="tab"] {
+        background-color: #f0f2f6;
+        border-radius: 8px 8px 0 0 !important;
         padding: 8px 16px;
+        margin-right: 0 !important;
+        border: none !important;
+        transition: all 0.2s;
     }
     
-    /* Tab styling */
-    .stTabs [role="tablist"] {
-        margin-bottom: 15px;
+    div[data-testid="stTabs"] > div > div > button[data-baseweb="tab"]:hover {
+        background-color: #e0e3e9;
     }
     
-    .stTabs [role="tab"] {
-        padding: 10px 20px;
-        border-radius: 8px 8px 0 0;
+    /* Plan tab color */
+    div[data-testid="stTabs"] > div > div > button[data-baseweb="tab"]:nth-child(1) {
+        background-color: #FF6B6B !important;
+        color: white !important;
+    }
+    
+    /* Do tab color */
+    div[data-testid="stTabs"] > div > div > button[data-baseweb="tab"]:nth-child(2) {
+        background-color: #4ECDC4 !important;
+        color: white !important;
+    }
+    
+    /* Check tab color */
+    div[data-testid="stTabs"] > div > div > button[data-baseweb="tab"]:nth-child(3) {
+        background-color: #45B7D1 !important;
+        color: white !important;
+    }
+    
+    /* Act tab color */
+    div[data-testid="stTabs"] > div > div > button[data-baseweb="tab"]:nth-child(4) {
+        background-color: #96CEB4 !important;
+        color: white !important;
+    }
+    
+    /* Dashboard tab color */
+    div[data-testid="stTabs"] > div > div > button[data-baseweb="tab"]:nth-child(5) {
+        background-color: #2c3e50 !important;
+        color: white !important;
+    }
+    
+    /* Active tab indicator removal */
+    div[data-testid="stTabs"] > div > div > button[aria-selected="true"]::before {
+        display: none !important;
     }
     
     /* File browser inspired elements */
