@@ -709,4 +709,243 @@ def main():
                         st.markdown("**Problem:**")
                         st.info(plan_data['problem'])
                     if plan_data.get('root_cause'):
-                        st.
+                        st.write("**Ursachen:**", plan_data['root_cause'])
+            if plan_data.get('measures'):
+                st.write("**Maßnahmen:**")
+                for measure in plan_data['measures']:
+                    st.write(f"• {measure}")
+    
+    with tab2:  # DO
+        st.markdown('<div class="phase-card do-card"><h3>🔨 Do - Umsetzen</h3></div>', unsafe_allow_html=True)
+        show_pdca_progress('do')
+        
+        # Aufgaben-Management
+        st.subheader("📋 Aufgaben-Tracking")
+        
+        if st.session_state.user_role in ['Admin', 'Bearbeiter']:
+            # Neue Aufgabe hinzufügen
+            with st.expander("➕ Neue Aufgabe hinzufügen"):
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    new_task = st.text_input("Aufgabe:")
+                with col2:
+                    new_responsible = st.text_input("Verantwortlich:")
+                with col3:
+                    new_date = st.date_input("Fälligkeitsdatum:")
+                
+                if st.button("Aufgabe hinzufügen") and new_task:
+                    if 'do' not in current_proj:
+                        current_proj['do'] = {'implementation_steps': []}
+                    if 'implementation_steps' not in current_proj['do']:
+                        current_proj['do']['implementation_steps'] = []
+                    
+                    current_proj['do']['implementation_steps'].append({
+                        'task': new_task,
+                        'responsible': new_responsible,
+                        'due_date': new_date.strftime('%Y-%m-%d'),
+                        'status': 'open',
+                        'priority': 'medium'
+                    })
+                    st.rerun()
+        
+        # Aufgabenliste anzeigen
+        tasks = current_proj.get('do', {}).get('implementation_steps', [])
+        if tasks:
+            for i, task in enumerate(tasks):
+                with st.container():
+                    col1, col2, col3, col4, col5 = st.columns([3, 2, 2, 1, 1])
+                    
+                    with col1:
+                        task_class = "task-completed" if task['status'] == 'completed' else ""
+                        st.markdown(f'<div class="{task_class}">{task["task"]}</div>', unsafe_allow_html=True)
+                    
+                    with col2:
+                        st.write(f"👤 {task['responsible']}")
+                    
+                    with col3:
+                        st.write(f"📅 {task['due_date']}")
+                    
+                    with col4:
+                        if st.session_state.user_role in ['Admin', 'Bearbeiter']:
+                            new_status = st.selectbox("", ['open', 'in_progress', 'completed'], 
+                                                    index=['open', 'in_progress', 'completed'].index(task['status']),
+                                                    key=f"status_{i}")
+                            task['status'] = new_status
+                    
+                    with col5:
+                        if st.session_state.user_role == 'Admin':
+                            if st.button("🗑️", key=f"delete_{i}"):
+                                tasks.pop(i)
+                                st.rerun()
+                    
+                    st.divider()
+        else:
+            st.info("Noch keine Aufgaben definiert.")
+    
+    with tab3:  # CHECK
+        st.markdown('<div class="phase-card check-card"><h3>📊 Check - Überprüfen</h3></div>', unsafe_allow_html=True)
+        show_pdca_progress('check')
+        
+        if st.session_state.user_role in ['Admin', 'Bearbeiter']:
+            st.subheader("📈 Kennzahlen & Ergebnisse")
+            
+            # Metriken eingeben
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                metric1 = st.number_input("Vorher-Wert:", 
+                                        value=current_proj.get('check', {}).get('metrics', {}).get('wartezeit_vorher', 0.0))
+            with col2:
+                metric2 = st.number_input("Nachher-Wert:", 
+                                        value=current_proj.get('check', {}).get('metrics', {}).get('wartezeit_nachher', 0.0))
+            with col3:
+                if metric1 > 0:
+                    improvement = ((metric1 - metric2) / metric1) * 100
+                    st.metric("Verbesserung", f"{improvement:.1f}%")
+            
+            # Ergebnisbewertung
+            results = st.text_area("Ergebnisbewertung:", 
+                                 current_proj.get('check', {}).get('results', ''))
+            
+            # Speichern
+            if 'check' not in current_proj:
+                current_proj['check'] = {}
+            current_proj['check'].update({
+                'metrics': {
+                    'wartezeit_vorher': metric1,
+                    'wartezeit_nachher': metric2,
+                    'verbesserung_prozent': improvement if metric1 > 0 else 0
+                },
+                'results': results
+            })
+        else:
+            # Nur anzeigen
+            check_data = current_proj.get('check', {})
+            if check_data.get('metrics'):
+                metrics = check_data['metrics']
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    st.metric("Vorher", metrics.get('wartezeit_vorher', 0))
+                with col2:
+                    st.metric("Nachher", metrics.get('wartezeit_nachher', 0))
+                with col3:
+                    st.metric("Verbesserung", f"{metrics.get('verbesserung_prozent', 0):.1f}%")
+            
+            if check_data.get('results'):
+                st.write("**Ergebnisse:**", check_data['results'])
+    
+    with tab4:  # ACT
+        st.markdown('<div class="phase-card act-card"><h3>🎯 Act - Handeln</h3></div>', unsafe_allow_html=True)
+        show_pdca_progress('act')
+        
+        if st.session_state.user_role in ['Admin', 'Bearbeiter']:
+            st.subheader("📋 Standardisierung & Nächste Schritte")
+            
+            # Standardisierung
+            standardization = st.text_area("Standardisierung:", 
+                                         current_proj.get('act', {}).get('standardization', ''),
+                                         help="Wie werden die Verbesserungen dauerhaft verankert?")
+            
+            # Lessons Learned
+            lessons = st.text_area("Lessons Learned:", 
+                                 current_proj.get('act', {}).get('lessons_learned', ''),
+                                 help="Was haben Sie gelernt? Was würden Sie anders machen?")
+            
+            # Nächste Schritte
+            next_steps = st.text_area("Nächste Schritte:", 
+                                    current_proj.get('act', {}).get('next_steps', ''),
+                                    help="Welche Folgemaßnahmen sind geplant?")
+            
+            # Speichern
+            if 'act' not in current_proj:
+                current_proj['act'] = {}
+            current_proj['act'].update({
+                'standardization': standardization,
+                'lessons_learned': lessons,
+                'next_steps': next_steps
+            })
+        else:
+            # Nur anzeigen
+            act_data = current_proj.get('act', {})
+            if act_data.get('standardization'):
+                st.write("**Standardisierung:**", act_data['standardization'])
+            if act_data.get('lessons_learned'):
+                st.write("**Lessons Learned:**", act_data['lessons_learned'])
+            if act_data.get('next_steps'):
+                st.write("**Nächste Schritte:**", act_data['next_steps'])
+    
+    with tab5:  # DASHBOARD
+        st.header("📈 Projekt-Dashboard")
+        
+        # KPIs
+        col1, col2, col3, col4 = st.columns(4)
+        
+        tasks = current_proj.get('do', {}).get('implementation_steps', [])
+        total_tasks = len(tasks)
+        completed_tasks = len([t for t in tasks if t['status'] == 'completed'])
+        in_progress_tasks = len([t for t in tasks if t['status'] == 'in_progress'])
+        overdue_tasks = len([t for t in tasks if t['status'] != 'completed' and 
+                           datetime.strptime(t['due_date'], '%Y-%m-%d') < datetime.now()])
+        
+        with col1:
+            st.metric("Gesamt Aufgaben", total_tasks)
+        with col2:
+            st.metric("Abgeschlossen", completed_tasks, f"{completed_tasks}/{total_tasks}")
+        with col3:
+            st.metric("In Bearbeitung", in_progress_tasks)
+        with col4:
+            st.metric("Überfällig", overdue_tasks, delta=f"-{overdue_tasks}" if overdue_tasks > 0 else None)
+        
+        # Aufgaben-Status Diagramm
+        if tasks:
+            status_counts = {}
+            for task in tasks:
+                status = task['status']
+                status_counts[status] = status_counts.get(status, 0) + 1
+            
+            fig = px.pie(
+                values=list(status_counts.values()),
+                names=list(status_counts.keys()),
+                title="Aufgaben-Status Verteilung",
+                color_discrete_map={
+                    'completed': '#4CAF50',
+                    'in_progress': '#FFA500',
+                    'open': '#FF4444'
+                }
+            )
+            st.plotly_chart(fig, use_container_width=True)
+        
+        # Zeitlicher Verlauf (falls Metriken vorhanden)
+        check_data = current_proj.get('check', {}).get('metrics', {})
+        if check_data:
+            fig = go.Figure()
+            fig.add_trace(go.Bar(
+                x=['Vorher', 'Nachher'],
+                y=[check_data.get('wartezeit_vorher', 0), check_data.get('wartezeit_nachher', 0)],
+                marker_color=['#FF6B6B', '#4CAF50']
+            ))
+            fig.update_layout(title="Verbesserung im Vergleich", yaxis_title="Wert")
+            st.plotly_chart(fig, use_container_width=True)
+    
+    # Export-Funktionen
+    st.sidebar.markdown("---")
+    st.sidebar.subheader("🔄 Aktionen")
+    
+    if st.sidebar.button("📥 Projekt exportieren"):
+        project_json = json.dumps(current_proj, indent=2, ensure_ascii=False, default=str)
+        st.sidebar.download_button(
+            label="💾 JSON herunterladen",
+            data=project_json,
+            file_name=f"kvp_projekt_{current_proj['name'].replace(' ', '_')}.json",
+            mime="application/json"
+        )
+    
+    if st.sidebar.button("🗑️ Projekt löschen") and st.session_state.user_role == 'Admin':
+        if len(st.session_state.projects) > 1:
+            del st.session_state.projects[st.session_state.current_project]
+            st.session_state.current_project = list(st.session_state.projects.keys())[0]
+            st.rerun()
+        else:
+            st.sidebar.error("Das letzte Projekt kann nicht gelöscht werden.")
+
+if __name__ == "__main__":
+    main()
